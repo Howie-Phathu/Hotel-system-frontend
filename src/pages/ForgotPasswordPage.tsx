@@ -1,7 +1,7 @@
 import React from 'react';
 import './forgotPasswordPage.css';
 import PasswordImage from '../assets/Password.png'
-import { FaEnvelope } from 'react-icons/fa';
+// import { FaEnvelope } from 'react-icons/fa';
 
 const ForgotPasswordPage: React.FC = () => {
   return (
@@ -19,7 +19,7 @@ const ForgotPasswordPage: React.FC = () => {
                   Email Address
                 </label>
                 <div className="input-group">
-                  <FaEnvelope className="input-icon" />
+                  {/* <FaEnvelope className="input-icon" /> */}
                   <input
                     type="email"
                     id="email"

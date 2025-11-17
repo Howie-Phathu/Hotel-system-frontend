@@ -3,7 +3,8 @@ import { useDispatch } from 'react-redux';
 import { adminAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import './AdminDashboard.css';
-import { FaUsers, FaHotel, FaBook, FaDollarSign, FaClock, FaCheckCircle } from 'react-icons/fa';
+import AdminImg from '../../src/assets/dashboard.png'
+import { FaUsers, FaHotel, FaBook, FaMoneyBillWave, FaClock, FaCheckCircle } from 'react-icons/fa';
 
 interface DashboardStats {
   totalUsers: number;
@@ -193,13 +194,15 @@ const AdminDashboard: React.FC = () => {
     return new Intl.NumberFormat('en-ZA', {
       style: 'currency',
       currency: 'ZAR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
   return (
     <div className="admin-dashboard">
       <div className="admin-header">
-        <h1>Admin Dashboard</h1>
+        <h1><img src={AdminImg} alt="dashboard image" width={28} /> Admin Dashboard</h1>
         <p>Manage hotels, bookings, and users</p>
       </div>
 
@@ -269,7 +272,7 @@ const AdminDashboard: React.FC = () => {
 
                 <div className="stat-card">
                   <div className="stat-icon">
-                    <FaDollarSign />
+                    <FaMoneyBillWave />
                   </div>
                   <div className="stat-info">
                     <h3>{formatCurrency(stats.totalRevenue)}</h3>
@@ -303,7 +306,7 @@ const AdminDashboard: React.FC = () => {
               <div className="table-container">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                   <h2>Hotels Management</h2>
-                  <button className="btn-primary" onClick={handleCreateHotel}>
+                  <button className="btn" onClick={handleCreateHotel} style={{background: "#5CC1FF", fontSize: "18px", color: "#353333ff"}}>
                     + Add New Hotel
                   </button>
                 </div>
@@ -368,44 +371,61 @@ const AdminDashboard: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {bookings.map((booking) => (
-                      <tr key={booking.id}>
-                        <td>
-                          {booking.user?.first_name} {booking.user?.last_name}
-                          <br />
-                          <small>{booking.user?.email}</small>
-                        </td>
-                        <td>
-                          {booking.hotel?.name}
-                          <br />
-                          <small>{booking.hotel?.city}</small>
-                        </td>
-                        <td>{formatDate(booking.check_in_date)}</td>
-                        <td>{formatDate(booking.check_out_date)}</td>
-                        <td>{formatCurrency(booking.total_amount)}</td>
-                        <td>
-                          <span className={`status-badge ${booking.booking_status}`}>
-                            {booking.booking_status}
-                          </span>
-                        </td>
-                        <td>
-                          <span className={`status-badge ${booking.payment_status}`}>
-                            {booking.payment_status}
-                          </span>
-                        </td>
-                        <td>
-                          <button
-                            className="btn-edit"
-                            onClick={() => {
-                              setSelectedBooking(booking);
-                              setShowBookingModal(true);
-                            }}
-                          >
-                            Manage
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {bookings.map((booking) => {
+                      // Handle both nested user object and flat user fields
+                      const userName = booking.user?.first_name && booking.user?.last_name
+                        ? `${booking.user.first_name} ${booking.user.last_name}`
+                        : booking.user_name || booking.user?.email?.split('@')[0] || 'N/A';
+                      const userEmail = booking.user?.email || booking.user_email || 'N/A';
+                      const hotelName = booking.hotel?.name || booking.hotel_name || 'N/A';
+                      const hotelCity = booking.hotel?.city || booking.hotel_location || '';
+                      const totalAmount = booking.total_amount || booking.total_price || 0;
+                      const bookingStatus = booking.booking_status || booking.status || 'pending';
+                      const paymentStatus = booking.payment_status || 'pending';
+                      
+                      return (
+                        <tr key={booking.id}>
+                          <td>
+                            <strong>{userName}</strong>
+                            <br />
+                            <small>{userEmail}</small>
+                          </td>
+                          <td>
+                            {hotelName}
+                            {hotelCity && (
+                              <>
+                                <br />
+                                <small>{hotelCity}</small>
+                              </>
+                            )}
+                          </td>
+                          <td>{formatDate(booking.check_in_date)}</td>
+                          <td>{formatDate(booking.check_out_date)}</td>
+                          <td>{formatCurrency(totalAmount)}</td>
+                          <td>
+                            <span className={`status-badge ${bookingStatus}`}>
+                              {bookingStatus}
+                            </span>
+                          </td>
+                          <td>
+                            <span className={`status-badge ${paymentStatus}`}>
+                              {paymentStatus}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              className="btn-edit"
+                              onClick={() => {
+                                setSelectedBooking(booking);
+                                setShowBookingModal(true);
+                              }}
+                            >
+                              Manage
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -428,7 +448,9 @@ const AdminDashboard: React.FC = () => {
                     {users.map((user) => (
                       <tr key={user.id}>
                         <td>
-                          {user.first_name} {user.last_name}
+                          {user.first_name || user.last_name 
+                            ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
+                            : user.email?.split('@')[0] || 'N/A'}
                         </td>
                         <td>{user.email}</td>
                         <td>
@@ -576,11 +598,27 @@ const AdminDashboard: React.FC = () => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Manage Booking</h2>
             <div className="booking-details">
-              <p><strong>User:</strong> {selectedBooking.user?.email}</p>
-              <p><strong>Hotel:</strong> {selectedBooking.hotel?.name}</p>
-              <p><strong>Dates:</strong> {formatDate(selectedBooking.check_in_date)} - {formatDate(selectedBooking.check_out_date)}</p>
-              <p><strong>Amount:</strong> {formatCurrency(selectedBooking.total_amount)}</p>
-              <p><strong>Current Status:</strong> {selectedBooking.booking_status}</p>
+              <p><strong>User:</strong> {
+                selectedBooking.user?.first_name && selectedBooking.user?.last_name
+                  ? `${selectedBooking.user.first_name} ${selectedBooking.user.last_name}`
+                  : selectedBooking.user?.name || selectedBooking.user?.email || 'N/A'
+              }</p>
+              {selectedBooking.user?.email && (
+                <p><strong>Email:</strong> {selectedBooking.user.email}</p>
+              )}
+              <p><strong>Hotel:</strong> {selectedBooking.hotel?.name || 'N/A'}</p>
+              {selectedBooking.hotel?.city && (
+                <p><strong>Location:</strong> {selectedBooking.hotel.city}</p>
+              )}
+              <p><strong>Check-in:</strong> {formatDate(selectedBooking.check_in_date)}</p>
+              <p><strong>Check-out:</strong> {formatDate(selectedBooking.check_out_date)}</p>
+              <p><strong>Amount:</strong> {formatCurrency(selectedBooking.total_amount || selectedBooking.total_price || 0)}</p>
+              <p><strong>Booking Status:</strong> <span className={`status-badge ${selectedBooking.booking_status || selectedBooking.status}`}>
+                {selectedBooking.booking_status || selectedBooking.status || 'pending'}
+              </span></p>
+              <p><strong>Payment Status:</strong> <span className={`status-badge ${selectedBooking.payment_status || 'pending'}`}>
+                {selectedBooking.payment_status || 'pending'}
+              </span></p>
             </div>
             <div className="status-actions">
               <button

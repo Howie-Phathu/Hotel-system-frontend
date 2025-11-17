@@ -48,7 +48,7 @@ const ProfilePage: React.FC = () => {
   const loadBookings = async () => {
     try {
       setLoading(true);
-      const response = await bookingsAPI.getAll();
+      const response = await bookingsAPI.getMyBookings();
       setBookings(response.bookings || response.data?.bookings || []);
     } catch (error: any) {
       console.error('Failed to load bookings:', error);
@@ -231,7 +231,7 @@ const ProfilePage: React.FC = () => {
                       onChange={(e) => setFirstName(e.target.value)}
                     />
                   ) : (
-                    <p>{user.first_name || 'Not set'}</p>
+                    <p style={{border: "1px solid #f0e8e8ff", borderRadius: "8px"}}>{user.first_name || 'Not set'}</p>
                   )}
                 </div>
 
@@ -246,7 +246,7 @@ const ProfilePage: React.FC = () => {
                       onChange={(e) => setLastName(e.target.value)}
                     />
                   ) : (
-                    <p>{user.last_name || 'Not set'}</p>
+                    <p style={{border: "1px solid #f0e8e8ff", borderRadius: "8px"}}>{user.last_name || 'Not set'}</p>
                   )}
                 </div>
 
@@ -254,14 +254,14 @@ const ProfilePage: React.FC = () => {
                   <label>
                     <FaEnvelope /> Email
                   </label>
-                  <p>{user.email}</p>
+                  <p style={{border: "1px solid #f0e8e8ff", borderRadius: "8px"}}>{user.email}</p>
                 </div>
 
                 <div className="form-group">
                   <label>
                     <FaCalendar /> Member Since
                   </label>
-                  <p>{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</p>
+                  <p style={{border: "1px solid #f0e8e8ff", borderRadius: "8px"}}>{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</p>
                 </div>
               </div>
 
@@ -329,9 +329,9 @@ const ProfilePage: React.FC = () => {
                         </span>
                       </div>
                       <div className="booking-details">
-                        <p><FaCalendar /> {new Date(booking.check_in).toLocaleDateString()} - {new Date(booking.check_out).toLocaleDateString()}</p>
-                        <p><FaMapMarkerAlt /> {booking.location || 'N/A'}</p>
-                        <p><strong>Total:</strong> R{booking.total_price || booking.total_amount || 0}</p>
+                        <p><FaCalendar /> {new Date(booking.check_in_date || booking.check_in).toLocaleDateString()} - {new Date(booking.check_out_date || booking.check_out).toLocaleDateString()}</p>
+                        <p><FaMapMarkerAlt /> {booking.location || booking.address || 'N/A'}</p>
+                        <p><strong>Total:</strong> {booking.currency || 'ZAR'} {parseFloat(booking.total_price || booking.total_amount || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                       </div>
                     </div>
                   ))}

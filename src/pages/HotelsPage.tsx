@@ -16,6 +16,32 @@ import { RootState } from '../store';
 
 
 
+// Helper function to get a unique default image for each hotel based on ID
+const getDefaultHotelImage = (hotelId: string | number | undefined): string => {
+  const defaultImages = [
+    HotelsPageImage,   // Hotel1.jpg
+    HotelsPageImage1,  // Capital.jpg
+    HotelsPageImage2,  // Max.jpg
+    HotelsPageImage3,  // Sky.jpg
+    HotelsPageImage4,  // Pretoria.jpg
+    HotelsPageImage5,  // Prime.jpg
+  ];
+  
+  if (!hotelId) return defaultImages[0];
+  
+  // Convert hotelId to a number for consistent hashing
+  const idStr = String(hotelId);
+  let hash = 0;
+  for (let i = 0; i < idStr.length; i++) {
+    hash = ((hash << 5) - hash) + idStr.charCodeAt(i);
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  // Use absolute value and modulo to get index
+  const index = Math.abs(hash) % defaultImages.length;
+  return defaultImages[index];
+};
+
 const HotelsPage: React.FC = () => {
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -237,7 +263,7 @@ const HotelsPage: React.FC = () => {
             <button 
               className="clear-filters-btn"
               onClick={clearFilters}
-              style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: '#5CC1FF', cursor: 'pointer', fontSize: "18px" }}
             >
               Clear All
             </button>
@@ -307,7 +333,11 @@ const HotelsPage: React.FC = () => {
                   <div key={hotelId} className="hotel-card">
                     <div className="hotel-image">
                       <img 
-                        src={Array.isArray(hotel.images) && hotel.images.length > 0 ? hotel.images[0] : hotel.image || HotelsPageImage} 
+                        src={
+                          Array.isArray(hotel.images) && hotel.images.length > 0 
+                            ? hotel.images[0] 
+                            : hotel.image || getDefaultHotelImage(hotelId)
+                        } 
                         alt={hotel.name} 
                       />
                       
@@ -357,7 +387,7 @@ const HotelsPage: React.FC = () => {
                           View Details
                         </Link>
                         <div className="hotel-price">
-                          <span className="price">R{hotel.price_per_night || hotel.price}</span>
+                          <span className="price"><small>R {hotel.price_per_night || hotel.price}</small></span>
                           <span className="price-unit">per night</span>
                         </div>
                       </div>
@@ -368,6 +398,17 @@ const HotelsPage: React.FC = () => {
             )}
           </div>
         )}
+
+        <div className="pagination" style={{margin: "5% 35%"}}>
+          <a href="#">&laquo;</a>
+          <a className="active" href="#">1</a>
+          <a href="#">2</a>
+          <a href="#">3</a>
+          <a href="#">4</a>
+          <a href="#">5</a>
+          <a href="#">6</a>
+          <a href="#">&raquo;</a>
+        </div>
 
       </div>
     </div>

@@ -267,6 +267,21 @@ export const userAPI = {
     const response = await api.put(`/users/notifications/${id}/read`);
     return response.data;
   },
+  
+  getMyReviews: async (page?: number, limit?: number) => {
+    const response = await api.get('/users/reviews', { params: { page, limit } });
+    return response.data;
+  },
+  
+  updateProfile: async (data: { first_name?: string; last_name?: string; phone?: string; avatar_url?: string }) => {
+    const response = await api.put('/users/profile', data);
+    return response.data;
+  },
+  
+  updatePassword: async (data: { currentPassword: string; newPassword: string }) => {
+    const response = await api.put('/users/password', data);
+    return response.data;
+  },
 };
 
 // Admin API

@@ -63,7 +63,7 @@
 }
 
 .date-input:focus {
-  border-color: #007bff;
+  border-color: #5CC1FF;
 }
 
 .guests-input {
@@ -82,7 +82,7 @@
 
 .search-btn {
   padding: 0.75rem 1.5rem;
-  background: #2170c5;
+  background: #5CC1FF;
   color: white;
   border: none;
   border-radius: 0.5rem;
@@ -96,28 +96,31 @@
 }
 
 .search-btn:hover {
-  background: #0056b3;
+  background: #5CC1FF;
 }
 
 .filters-section {
+  margin-bottom: 3rem;
+}
+
+.filters-grid{
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
 }
 
 .filter-group label {
   font-weight: 500;
   color: #333;
+  margin-bottom: 5px;
 }
 
-.filter-select {
+.filter-select, .filter-input {
   padding: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 0.5rem;
@@ -167,7 +170,7 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(235, 6, 6, 0.9);
   border: none;
   border-radius: 50%;
   width: 40px;
@@ -245,7 +248,7 @@
 .price {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #007bff;
+  color: #151616;
 }
 
 .price-unit {
@@ -255,7 +258,7 @@
 
 .view-btn {
   padding: 0.5rem 1rem;
-  background: #007bff;
+  background: #5CC1FF;
   color: white;
   text-decoration: none;
   border-radius: 0.5rem;
@@ -265,7 +268,7 @@
 }
 
 .view-btn:hover {
-  background: #0056b3;
+  background: #5CC1FF;
 }
 
 /* Pagination */

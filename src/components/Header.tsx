@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { logout } from '../store/slices/authSlice';
 import { FaBars, FaTimes, FaSearch, FaMoon, FaSun} from 'react-icons/fa';
-import HotelIcon from '../assets/HotelIcon.png';
-import FavoriteIcon from '../assets/favourite.png';
-import LoginIcon from '../assets/login.png';
-import LogoutIcon from '../assets/log-out.png';
-import UserIcon from '../assets/user.png';
+import HotelIcon from '../assets/city.png';
+import FavoriteIcon from '../assets/favorite.png';
+import LoginIcon from '../assets/user.png';
+import LogoutIcon from '../assets/logout.png';
+import UserIcon from '../assets/add.png';
 import NotificationBell from './NotificationBell';
+import LogoIcon from '../assets/logo.png'
 import './Header.css';
 import './NotificationBell.css';
 
@@ -17,6 +18,7 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -41,17 +43,34 @@ const Header: React.FC = () => {
     dispatch({ type: 'ui/setTheme', payload: theme === 'light' ? 'dark' : 'light' });
   };
 
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      menuRef.current && 
+      !menuRef.current.contains(event.target as Node) &&
+      isMenuOpen
+    ) {
+      setIsMenuOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, [isMenuOpen]);
+
   return (
     <header className={`header ${theme}`}>
       <div className="container">
         <div className="header-content">
           {/* Logo */}
           <Link to="/" className="logo" style={{textDecoration: "none"}}>
-            <h1>HotelEase</h1>
+            <h1><img src={LogoIcon} alt="hotelease icon" /> HotelEase</h1>
           </Link>
 
           {/* Search Bar */}
-          <div className={`search-container ${isSearchOpen ? 'active' : ''}`}>
+          {/* <div className={`search-container ${isSearchOpen ? 'active' : ''}`}>
             <form onSubmit={handleSearch} className="search-form">
               <input
                 type="text"
@@ -64,18 +83,10 @@ const Header: React.FC = () => {
                 <FaSearch />
               </button>
             </form>
-          </div>
+          </div> */}
 
           {/* Navigation */}
-          <nav id="main-navigation" className={`nav ${isMenuOpen ? 'active' : ''}`}>
-
-            <button 
-                className="close-btn" 
-                onClick={() => setIsMenuOpen(false)} // <--- Set state directly to false
-                aria-label="Close Menu"
-            >
-                &times; {/* HTML entity for 'X' or an icon like FaTimes */}
-            </button>
+          <nav id="main-navigation" ref={menuRef} className={`nav ${isMenuOpen ? 'active' : ''}`}>
 
             <Link to="/hotels" className="nav-link">
               <img src={HotelIcon} alt="HotelIcon" width={20} />
@@ -103,10 +114,10 @@ const Header: React.FC = () => {
                             .join('')
                             .substring(0, 2)
                             .toUpperCase()
-                        : <img src={UserIcon} alt="user icon" width={32} />}
+                        : <img src={UserIcon} alt="user icon" width={35} />}
                     </span>
                   )}
-                  Profile
+                  {user?.first_name}
                 </Link>
 
                 <Link to="/favorites" className="nav-link">
