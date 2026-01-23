@@ -68,9 +68,9 @@ const BookingConfirmationPage: React.FC = () => {
             hotel_id: bookingData.hotel_id || bookingData.hotel?.id || '',
             check_in_date: bookingData.check_in_date || bookingData.checkInDate || '',
             check_out_date: bookingData.check_out_date || bookingData.checkOutDate || '',
-            number_of_guests: bookingData.number_of_guests || bookingData.adults || bookingData.guests || 1,
-            number_of_rooms: bookingData.number_of_rooms || bookingData.rooms || 1,
-            total_amount: bookingData.total_amount || bookingData.total_price || bookingData.totalAmount || '0',
+            number_of_guests: bookingData.adults || bookingData.number_of_guests || bookingData.guests || 1,
+            number_of_rooms: bookingData.rooms || bookingData.number_of_rooms || 1,
+            total_amount: String(bookingData.total_price || bookingData.total_amount || bookingData.totalAmount || '0'),
             currency: bookingData.currency || 'ZAR',
             booking_status: bookingData.status || bookingData.booking_status || 'confirmed',
             payment_status: bookingData.payment_status || bookingData.paymentStatus || 'paid',
@@ -83,12 +83,12 @@ const BookingConfirmationPage: React.FC = () => {
             },
             user: {
               email: bookingData.user_email || bookingData.user?.email || '',
-              first_name: bookingData.first_name || bookingData.user?.first_name,
-              last_name: bookingData.last_name || bookingData.user?.last_name,
+              first_name: bookingData.user_first_name || bookingData.user?.first_name,
+              last_name: bookingData.user_last_name || bookingData.user?.last_name,
             },
             guest_details: bookingData.guest_details || {
-              name: bookingData.first_name && bookingData.last_name 
-                ? `${bookingData.first_name} ${bookingData.last_name}` 
+              name: (bookingData.user_first_name || bookingData.user?.first_name) && (bookingData.user_last_name || bookingData.user?.last_name)
+                ? `${bookingData.user_first_name || bookingData.user?.first_name} ${bookingData.user_last_name || bookingData.user?.last_name}` 
                 : undefined,
               email: bookingData.user_email || bookingData.email,
               phone: bookingData.phone,
@@ -98,6 +98,7 @@ const BookingConfirmationPage: React.FC = () => {
           
           console.log('Transformed booking:', transformedBooking);
           setBooking(transformedBooking);
+          setLoading(false);
         } else {
           throw new Error('Booking data not found in response');
         }

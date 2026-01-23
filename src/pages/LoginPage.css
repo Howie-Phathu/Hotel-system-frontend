@@ -75,7 +75,7 @@
 
 .forgot-password-link:hover {
   color: #0056b3;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .input-group {
@@ -156,7 +156,7 @@
 .login-btn {
   width: 100%;
   padding: 0.875rem 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #5CC1FF;
   color: white;
   border: none;
   border-radius: 0.5rem;
@@ -195,7 +195,7 @@
 }
 
 .signup-link a:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .login-image {

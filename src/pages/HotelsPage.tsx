@@ -237,7 +237,7 @@ const HotelsPage: React.FC = () => {
             <button 
               className="clear-filters-btn"
               onClick={clearFilters}
-              style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: '#5CC1FF', cursor: 'pointer', fontSize: "18px" }}
             >
               Clear All
             </button>
@@ -307,7 +307,7 @@ const HotelsPage: React.FC = () => {
                   <div key={hotelId} className="hotel-card">
                     <div className="hotel-image">
                       <img 
-                        src={Array.isArray(hotel.images) && hotel.images.length > 0 ? hotel.images[0] : hotel.image || HotelsPageImage} 
+                        src={Array.isArray(hotel.images) && hotel.images.length > 0 ? hotel.images[0] : hotel.image || HotelsPageImage2} 
                         alt={hotel.name} 
                       />
                       
@@ -357,7 +357,7 @@ const HotelsPage: React.FC = () => {
                           View Details
                         </Link>
                         <div className="hotel-price">
-                          <span className="price">R{hotel.price_per_night || hotel.price}</span>
+                          <span className="price"><small>R {hotel.price_per_night || hotel.price}</small></span>
                           <span className="price-unit">per night</span>
                         </div>
                       </div>
@@ -368,6 +368,17 @@ const HotelsPage: React.FC = () => {
             )}
           </div>
         )}
+
+        <div className="pagination" style={{margin: "5% 35%"}}>
+          <a href="#">&laquo;</a>
+          <a className="active" href="#">1</a>
+          <a href="#">2</a>
+          <a href="#">3</a>
+          <a href="#">4</a>
+          <a href="#">5</a>
+          <a href="#">6</a>
+          <a href="#">&raquo;</a>
+        </div>
 
       </div>
     </div>

@@ -32,7 +32,7 @@
 .avatar-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #000000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,7 +81,7 @@
   background: transparent;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
+  font-size: 18px;
   color: #666;
   display: flex;
   align-items: center;
@@ -95,7 +95,7 @@
 }
 
 .profile-tabs button.active {
-  background: #007bff;
+  background: #5CC1FF;
   color: white;
 }
 
@@ -141,12 +141,12 @@
 }
 
 .edit-btn {
-  background: #007bff;
+  background: #5CC1FF;
   color: white;
 }
 
 .edit-btn:hover {
-  background: #0056b3;
+  background: #5CC1FF;
 }
 
 .save-btn {
@@ -201,7 +201,7 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: #5CC1FF;
 }
 
 .form-group p {
@@ -225,13 +225,15 @@
 
 .change-password-btn,
 .update-password-btn {
-  background: #007bff;
+  background: #5CC1FF;
   color: white;
+  border: none;
+  border-radius: 8px;
 }
 
 .change-password-btn:hover,
 .update-password-btn:hover {
-  background: #0056b3;
+  background: #5CC1FF;
 }
 
 .update-password-btn {

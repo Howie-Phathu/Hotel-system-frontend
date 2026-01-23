@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate, Link } from 'react-router-dom';
 import { RootState } from '@/store/index';
 import { updateProfile as updateReduxProfile } from '../store/slices/authSlice';
 import { userAPI, bookingsAPI } from '../services/api';
 import toast from 'react-hot-toast';
-import { FaUser, FaEnvelope, FaCalendar, FaMapMarkerAlt, FaEdit, FaSave, FaTimes, FaLock, FaStar, FaHeart, FaHistory } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaCalendar, FaMapMarkerAlt, FaEdit, FaSave, FaTimes, FaLock, FaStar, FaHeart, FaHistory, FaHome, FaArrowLeft } from 'react-icons/fa';
 import './ProfilePage.css';
 
 const ProfilePage: React.FC = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
 
   const [editMode, setEditMode] = useState(false);
@@ -48,7 +50,7 @@ const ProfilePage: React.FC = () => {
   const loadBookings = async () => {
     try {
       setLoading(true);
-      const response = await bookingsAPI.getAll();
+      const response = await bookingsAPI.getMyBookings();
       setBookings(response.bookings || response.data?.bookings || []);
     } catch (error: any) {
       console.error('Failed to load bookings:', error);
@@ -148,6 +150,49 @@ const ProfilePage: React.FC = () => {
   return (
     <div className="profile-page">
       <div className="container">
+        <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <button
+            onClick={() => navigate('/')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 20px',
+              background: '#5CC1FF',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'background 0.3s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.background = '#4aa8e6'}
+            onMouseOut={(e) => e.currentTarget.style.background = '#5CC1FF'}
+          >
+            <FaArrowLeft /> Back to Home
+          </button>
+          <Link 
+            to="/hotels"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 20px',
+              background: '#f0f0f0',
+              color: '#333',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'background 0.3s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.background = '#e0e0e0'}
+            onMouseOut={(e) => e.currentTarget.style.background = '#f0f0f0'}
+          >
+            <FaHome /> Browse Hotels
+          </Link>
+        </div>
         <div className="profile-header">
           <div className="profile-avatar">
             {user.avatar_url ? (
@@ -231,7 +276,7 @@ const ProfilePage: React.FC = () => {
                       onChange={(e) => setFirstName(e.target.value)}
                     />
                   ) : (
-                    <p>{user.first_name || 'Not set'}</p>
+                    <p style={{border: "1px solid #f0e8e8ff", borderRadius: "8px"}}>{user.first_name || 'Not set'}</p>
                   )}
                 </div>
 
@@ -246,7 +291,7 @@ const ProfilePage: React.FC = () => {
                       onChange={(e) => setLastName(e.target.value)}
                     />
                   ) : (
-                    <p>{user.last_name || 'Not set'}</p>
+                    <p style={{border: "1px solid #f0e8e8ff", borderRadius: "8px"}}>{user.last_name || 'Not set'}</p>
                   )}
                 </div>
 
@@ -254,14 +299,14 @@ const ProfilePage: React.FC = () => {
                   <label>
                     <FaEnvelope /> Email
                   </label>
-                  <p>{user.email}</p>
+                  <p style={{border: "1px solid #f0e8e8ff", borderRadius: "8px"}}>{user.email}</p>
                 </div>
 
                 <div className="form-group">
                   <label>
                     <FaCalendar /> Member Since
                   </label>
-                  <p>{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</p>
+                  <p style={{border: "1px solid #f0e8e8ff", borderRadius: "8px"}}>{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</p>
                 </div>
               </div>
 
@@ -329,9 +374,9 @@ const ProfilePage: React.FC = () => {
                         </span>
                       </div>
                       <div className="booking-details">
-                        <p><FaCalendar /> {new Date(booking.check_in).toLocaleDateString()} - {new Date(booking.check_out).toLocaleDateString()}</p>
-                        <p><FaMapMarkerAlt /> {booking.location || 'N/A'}</p>
-                        <p><strong>Total:</strong> R{booking.total_price || booking.total_amount || 0}</p>
+                        <p><FaCalendar /> {new Date(booking.check_in_date || booking.check_in).toLocaleDateString()} - {new Date(booking.check_out_date || booking.check_out).toLocaleDateString()}</p>
+                        <p><FaMapMarkerAlt /> {booking.location || booking.address || 'N/A'}</p>
+                        <p><strong>Total:</strong> {booking.currency || 'ZAR'} {parseFloat(booking.total_price || booking.total_amount || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                       </div>
                     </div>
                   ))}

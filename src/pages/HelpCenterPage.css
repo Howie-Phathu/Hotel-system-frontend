@@ -1,0 +1,21 @@
+.help-center-page {
+  padding: 5rem;
+  color: #333;
+}
+
+.help-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h2{
+    margin-bottom: 1rem;
+}
+
+.faq-item {
+  margin-bottom: 1rem;
+}
+
+.faq-item h3 {
+  margin-bottom: 0.25rem;
+}

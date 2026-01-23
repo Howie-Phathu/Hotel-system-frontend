@@ -1,0 +1,22 @@
+.about-us-page {
+  padding: 2rem;
+  color: #333;
+}
+
+.about-section {
+  margin-bottom: 2rem;
+}
+
+.about-section h2 {
+  margin-bottom: 0.5rem;
+  color: #000000;
+}
+
+.about-section ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+}
+
+.about-section ul li {
+  margin-bottom: 0.5rem;
+}

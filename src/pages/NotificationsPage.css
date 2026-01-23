@@ -48,7 +48,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: #007bff;
+  background: #5CC1FF;
   color: white;
   border: none;
   border-radius: 6px;
@@ -58,7 +58,7 @@
 }
 
 .mark-all-read-btn:hover {
-  background: #0056b3;
+  background: #5CC1FF;
 }
 
 .loading-state,
@@ -100,7 +100,7 @@
 }
 
 .notification-item.unread {
-  border-left-color: #007bff;
+  border-left-color: #5CC1FF;
   background: #f8f9ff;
 }
 
@@ -164,7 +164,7 @@
 
 .pagination-btn {
   padding: 0.5rem 1rem;
-  background: #007bff;
+  background: #5CC1FF;
   color: white;
   border: none;
   border-radius: 6px;
@@ -173,7 +173,7 @@
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: #0056b3;
+  background: #5CC1FF;
 }
 
 .pagination-btn:disabled {

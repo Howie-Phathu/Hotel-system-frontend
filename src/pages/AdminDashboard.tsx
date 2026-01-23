@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { adminAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import './AdminDashboard.css';
+import AdminImg from '../../src/assets/dashboard.png'
 import { FaUsers, FaHotel, FaBook, FaDollarSign, FaClock, FaCheckCircle } from 'react-icons/fa';
 
 interface DashboardStats {
@@ -56,6 +57,9 @@ const AdminDashboard: React.FC = () => {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [showHotelModal, setShowHotelModal] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [refundAmount, setRefundAmount] = useState('');
+  const [refundReason, setRefundReason] = useState('');
   const [hotelFormData, setHotelFormData] = useState({
     name: '',
     location: '',
@@ -115,6 +119,38 @@ const AdminDashboard: React.FC = () => {
       setShowBookingModal(false);
     } catch (error: any) {
       toast.error('Failed to update booking status');
+    }
+  };
+
+  const handleProcessRefund = async () => {
+    if (!selectedBooking) return;
+
+    const amount = refundAmount ? parseFloat(refundAmount) : undefined;
+    
+    if (amount !== undefined && (isNaN(amount) || amount <= 0)) {
+      toast.error('Please enter a valid refund amount');
+      return;
+    }
+
+    try {
+      await adminAPI.processRefund(selectedBooking.id, amount, refundReason);
+      toast.success('Refund processed successfully');
+      setShowRefundModal(false);
+      setRefundAmount('');
+      setRefundReason('');
+      setShowBookingModal(false);
+      loadDashboardData();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to process refund');
+    }
+  };
+
+  const handleOpenRefundModal = () => {
+    if (selectedBooking) {
+      setRefundAmount((selectedBooking.total_amount || selectedBooking.total_price || 0).toString());
+      setRefundReason('');
+      setShowRefundModal(true);
+      setShowBookingModal(false);
     }
   };
 
@@ -199,7 +235,7 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="admin-dashboard">
       <div className="admin-header">
-        <h1>Admin Dashboard</h1>
+        <h1><img src={AdminImg} alt="dashboard image" width={28} /> Admin Dashboard</h1>
         <p>Manage hotels, bookings, and users</p>
       </div>
 
@@ -303,7 +339,7 @@ const AdminDashboard: React.FC = () => {
               <div className="table-container">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                   <h2>Hotels Management</h2>
-                  <button className="btn-primary" onClick={handleCreateHotel}>
+                  <button className="btn" onClick={handleCreateHotel} style={{background: "#5CC1FF", fontSize: "18px", color: "#353333ff"}}>
                     + Add New Hotel
                   </button>
                 </div>
@@ -368,44 +404,61 @@ const AdminDashboard: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {bookings.map((booking) => (
-                      <tr key={booking.id}>
-                        <td>
-                          {booking.user?.first_name} {booking.user?.last_name}
-                          <br />
-                          <small>{booking.user?.email}</small>
-                        </td>
-                        <td>
-                          {booking.hotel?.name}
-                          <br />
-                          <small>{booking.hotel?.city}</small>
-                        </td>
-                        <td>{formatDate(booking.check_in_date)}</td>
-                        <td>{formatDate(booking.check_out_date)}</td>
-                        <td>{formatCurrency(booking.total_amount)}</td>
-                        <td>
-                          <span className={`status-badge ${booking.booking_status}`}>
-                            {booking.booking_status}
-                          </span>
-                        </td>
-                        <td>
-                          <span className={`status-badge ${booking.payment_status}`}>
-                            {booking.payment_status}
-                          </span>
-                        </td>
-                        <td>
-                          <button
-                            className="btn-edit"
-                            onClick={() => {
-                              setSelectedBooking(booking);
-                              setShowBookingModal(true);
-                            }}
-                          >
-                            Manage
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {bookings.map((booking) => {
+                      // Handle both nested user object and flat user fields
+                      const userName = booking.user?.first_name && booking.user?.last_name
+                        ? `${booking.user.first_name} ${booking.user.last_name}`
+                        : booking.user_name || booking.user?.email?.split('@')[0] || 'N/A';
+                      const userEmail = booking.user?.email || booking.user_email || 'N/A';
+                      const hotelName = booking.hotel?.name || booking.hotel_name || 'N/A';
+                      const hotelCity = booking.hotel?.city || booking.hotel_location || '';
+                      const totalAmount = booking.total_amount || booking.total_price || 0;
+                      const bookingStatus = booking.booking_status || booking.status || 'pending';
+                      const paymentStatus = booking.payment_status || 'pending';
+                      
+                      return (
+                        <tr key={booking.id}>
+                          <td>
+                            <strong>{userName}</strong>
+                            <br />
+                            <small>{userEmail}</small>
+                          </td>
+                          <td>
+                            {hotelName}
+                            {hotelCity && (
+                              <>
+                                <br />
+                                <small>{hotelCity}</small>
+                              </>
+                            )}
+                          </td>
+                          <td>{formatDate(booking.check_in_date)}</td>
+                          <td>{formatDate(booking.check_out_date)}</td>
+                          <td>{formatCurrency(totalAmount)}</td>
+                          <td>
+                            <span className={`status-badge ${bookingStatus}`}>
+                              {bookingStatus}
+                            </span>
+                          </td>
+                          <td>
+                            <span className={`status-badge ${paymentStatus}`}>
+                              {paymentStatus}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              className="btn-edit"
+                              onClick={() => {
+                                setSelectedBooking(booking);
+                                setShowBookingModal(true);
+                              }}
+                            >
+                              Manage
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -428,7 +481,9 @@ const AdminDashboard: React.FC = () => {
                     {users.map((user) => (
                       <tr key={user.id}>
                         <td>
-                          {user.first_name} {user.last_name}
+                          {user.first_name || user.last_name 
+                            ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
+                            : user.email?.split('@')[0] || 'N/A'}
                         </td>
                         <td>{user.email}</td>
                         <td>
@@ -576,29 +631,161 @@ const AdminDashboard: React.FC = () => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Manage Booking</h2>
             <div className="booking-details">
-              <p><strong>User:</strong> {selectedBooking.user?.email}</p>
-              <p><strong>Hotel:</strong> {selectedBooking.hotel?.name}</p>
-              <p><strong>Dates:</strong> {formatDate(selectedBooking.check_in_date)} - {formatDate(selectedBooking.check_out_date)}</p>
-              <p><strong>Amount:</strong> {formatCurrency(selectedBooking.total_amount)}</p>
-              <p><strong>Current Status:</strong> {selectedBooking.booking_status}</p>
+              <p><strong>User:</strong> {
+                selectedBooking.user?.first_name && selectedBooking.user?.last_name
+                  ? `${selectedBooking.user.first_name} ${selectedBooking.user.last_name}`
+                  : selectedBooking.user?.name || selectedBooking.user?.email || 'N/A'
+              }</p>
+              {selectedBooking.user?.email && (
+                <p><strong>Email:</strong> {selectedBooking.user.email}</p>
+              )}
+              <p><strong>Hotel:</strong> {selectedBooking.hotel?.name || 'N/A'}</p>
+              {selectedBooking.hotel?.city && (
+                <p><strong>Location:</strong> {selectedBooking.hotel.city}</p>
+              )}
+              <p><strong>Check-in:</strong> {formatDate(selectedBooking.check_in_date)}</p>
+              <p><strong>Check-out:</strong> {formatDate(selectedBooking.check_out_date)}</p>
+              <p><strong>Amount:</strong> {formatCurrency(selectedBooking.total_amount || selectedBooking.total_price || 0)}</p>
+              <p><strong>Booking Status:</strong> <span className={`status-badge ${selectedBooking.booking_status || selectedBooking.status}`}>
+                {selectedBooking.booking_status || selectedBooking.status || 'pending'}
+              </span></p>
+              <p><strong>Payment Status:</strong> <span className={`status-badge ${selectedBooking.payment_status || 'pending'}`}>
+                {selectedBooking.payment_status || 'pending'}
+              </span></p>
             </div>
             <div className="status-actions">
               <button
                 className="btn-confirm"
                 onClick={() => handleUpdateBookingStatus(selectedBooking.id, 'confirmed')}
+                disabled={selectedBooking.booking_status === 'confirmed' || selectedBooking.status === 'confirmed'}
               >
                 Confirm
               </button>
               <button
                 className="btn-cancel"
                 onClick={() => handleUpdateBookingStatus(selectedBooking.id, 'cancelled')}
+                disabled={selectedBooking.booking_status === 'cancelled' || selectedBooking.status === 'cancelled'}
               >
-                Cancel
+                Cancel Booking
               </button>
+              {(selectedBooking.payment_status === 'paid' && 
+                selectedBooking.payment_status !== 'refunded') && (
+                <button
+                  className="btn-refund"
+                  onClick={handleOpenRefundModal}
+                  style={{
+                    background: '#f59e0b',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px 20px',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                >
+                  Process Refund
+                </button>
+              )}
             </div>
             <button className="btn-close" onClick={() => setShowBookingModal(false)}>
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {showRefundModal && selectedBooking && (
+        <div className="modal-overlay" onClick={() => setShowRefundModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+            <h2>Process Refund</h2>
+            <div className="booking-details">
+              <p><strong>Booking ID:</strong> {selectedBooking.id}</p>
+              <p><strong>User:</strong> {
+                selectedBooking.user?.first_name && selectedBooking.user?.last_name
+                  ? `${selectedBooking.user.first_name} ${selectedBooking.user.last_name}`
+                  : selectedBooking.user?.name || selectedBooking.user?.email || 'N/A'
+              }</p>
+              <p><strong>Hotel:</strong> {selectedBooking.hotel?.name || 'N/A'}</p>
+              <p><strong>Original Amount:</strong> {formatCurrency(selectedBooking.total_amount || selectedBooking.total_price || 0)}</p>
+              <p><strong>Payment Status:</strong> <span className={`status-badge ${selectedBooking.payment_status || 'pending'}`}>
+                {selectedBooking.payment_status || 'pending'}
+              </span></p>
+            </div>
+            
+            <div style={{ marginTop: '20px' }}>
+              <div className="form-group" style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                  Refund Amount (leave empty for full refund)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max={selectedBooking.total_amount || selectedBooking.total_price || 0}
+                  value={refundAmount}
+                  onChange={(e) => setRefundAmount(e.target.value)}
+                  placeholder={`${formatCurrency(selectedBooking.total_amount || selectedBooking.total_price || 0)}`}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+              
+              <div className="form-group" style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                  Reason (optional)
+                </label>
+                <textarea
+                  value={refundReason}
+                  onChange={(e) => setRefundReason(e.target.value)}
+                  placeholder="Enter refund reason..."
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    fontSize: '14px',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="status-actions" style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+              <button
+                className="btn-cancel"
+                onClick={() => {
+                  setShowRefundModal(false);
+                  setRefundAmount('');
+                  setRefundReason('');
+                  setShowBookingModal(true);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-refund"
+                onClick={handleProcessRefund}
+                style={{
+                  background: '#f59e0b',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                Process Refund
+              </button>
+            </div>
           </div>
         </div>
       )}

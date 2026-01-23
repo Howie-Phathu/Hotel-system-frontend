@@ -17,8 +17,8 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: start;
-  text-align: center;
+  /* align-items: start;
+  text-align: center; */
 }
 
 .hero-content {
@@ -37,8 +37,7 @@
   font-size: 1.2rem;
   color: #666;
   line-height: 1.6;
-  max-width: 600px;
-  align-items: start;
+  max-width: 1000px;
 }
 
 .hero-image {
