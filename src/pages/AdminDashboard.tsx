@@ -4,7 +4,11 @@ import { adminAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import './AdminDashboard.css';
 import AdminImg from '../../src/assets/dashboard.png'
+<<<<<<< HEAD
 import { FaUsers, FaHotel, FaBook, FaDollarSign, FaClock, FaCheckCircle } from 'react-icons/fa';
+=======
+import { FaUsers, FaHotel, FaBook, FaMoneyBillWave, FaClock, FaCheckCircle } from 'react-icons/fa';
+>>>>>>> 647b0fe737161dad2ca0042d29888c3307d1753b
 
 interface DashboardStats {
   totalUsers: number;
@@ -229,6 +233,8 @@ const AdminDashboard: React.FC = () => {
     return new Intl.NumberFormat('en-ZA', {
       style: 'currency',
       currency: 'ZAR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -305,7 +311,7 @@ const AdminDashboard: React.FC = () => {
 
                 <div className="stat-card">
                   <div className="stat-icon">
-                    <FaDollarSign />
+                    <FaMoneyBillWave />
                   </div>
                   <div className="stat-info">
                     <h3>{formatCurrency(stats.totalRevenue)}</h3>

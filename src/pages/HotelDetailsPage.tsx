@@ -12,6 +12,12 @@ import CapitalHotelImage1 from '../assets/Capital-1.jpg';
 import CapitalHotelImage2 from '../assets/Capital-2.jpg';
 import CapitalHotelImage3 from '../assets/Capital-3.jpg';
 
+import MaxHotelImage from '../assets/Max.jpg';
+import SkyHotelImage from '../assets/Sky.jpg';
+import PretoriaHotelImage from '../assets/Pretoria.jpg';
+import PrimeHotelImage from '../assets/Prime.jpg';
+import CapitalHotelImage from '../assets/Capital.jpg';
+
 import HotelMap from '../components/HotelMap';
 import ReviewsSection from '../components/ReviewsSection';
 import ShareModal from '../components/ShareModal';
@@ -20,6 +26,32 @@ import { setCheckIn, setCheckOut } from '@/store/slices/bookingSlice';
 import { RootState } from '@/store';
 import { hotelsAPI } from '../services/api';
 import toast from 'react-hot-toast';
+
+// Helper function to get a unique default image for each hotel based on ID
+const getDefaultHotelImage = (hotelId: string | number | undefined): string => {
+  const defaultImages = [
+    HotelsPageImage,      // Hotel1.jpg
+    CapitalHotelImage,    // Capital.jpg
+    MaxHotelImage,        // Max.jpg
+    SkyHotelImage,        // Sky.jpg
+    PretoriaHotelImage,   // Pretoria.jpg
+    PrimeHotelImage,      // Prime.jpg
+  ];
+  
+  if (!hotelId) return defaultImages[0];
+  
+  // Convert hotelId to a number for consistent hashing
+  const idStr = String(hotelId);
+  let hash = 0;
+  for (let i = 0; i < idStr.length; i++) {
+    hash = ((hash << 5) - hash) + idStr.charCodeAt(i);
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  // Use absolute value and modulo to get index
+  const index = Math.abs(hash) % defaultImages.length;
+  return defaultImages[index];
+};
 
 // Define the structure of a single amenity object
 export interface AmenityType {
@@ -149,7 +181,7 @@ const HotelDetailsPage: React.FC = () => {
               if (hotelData.image) {
                 return [hotelData.image];
               }
-              return [HotelsPageImage];
+              return [getDefaultHotelImage(hotelData.id || hotelData.hotel_id || hotelId)];
             })(),
             amenities: (() => {
               if (Array.isArray(hotelData.amenities) && hotelData.amenities.length > 0) {
@@ -300,7 +332,7 @@ const HotelDetailsPage: React.FC = () => {
         ) : (
           <div className="image-gallery">
             <div className="main-image">
-              <img src={HotelsPageImage} alt={hotel.name} />
+              <img src={getDefaultHotelImage(hotel.id)} alt={hotel.name} />
             </div>
           </div>
         )}
