@@ -333,15 +333,11 @@ const HotelsPage: React.FC = () => {
                   <div key={hotelId} className="hotel-card">
                     <div className="hotel-image">
                       <img 
-<<<<<<< HEAD
-                        src={Array.isArray(hotel.images) && hotel.images.length > 0 ? hotel.images[0] : hotel.image || HotelsPageImage2} 
-=======
                         src={
                           Array.isArray(hotel.images) && hotel.images.length > 0 
                             ? hotel.images[0] 
                             : hotel.image || getDefaultHotelImage(hotelId)
                         } 
->>>>>>> 647b0fe737161dad2ca0042d29888c3307d1753b
                         alt={hotel.name} 
                       />
                       
