@@ -4,11 +4,7 @@ import { adminAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import './AdminDashboard.css';
 import AdminImg from '../../src/assets/dashboard.png'
-<<<<<<< HEAD
-import { FaUsers, FaHotel, FaBook, FaDollarSign, FaClock, FaCheckCircle } from 'react-icons/fa';
-=======
 import { FaUsers, FaHotel, FaBook, FaMoneyBillWave, FaClock, FaCheckCircle } from 'react-icons/fa';
->>>>>>> 647b0fe737161dad2ca0042d29888c3307d1753b
 
 interface DashboardStats {
   totalUsers: number;

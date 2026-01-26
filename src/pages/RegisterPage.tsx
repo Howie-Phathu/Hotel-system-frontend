@@ -213,8 +213,6 @@ const RegisterPage: React.FC = () => {
               </button>
             </form>
 
-<<<<<<< HEAD
-=======
             <div className="divider">
               <span>Or continue with</span>
             </div>
@@ -248,8 +246,6 @@ const RegisterPage: React.FC = () => {
                 Continue with Facebook
               </button>
             </div>
-
->>>>>>> 647b0fe737161dad2ca0042d29888c3307d1753b
             <p className="login-link">
               Already have an account? <Link to="/login">Sign in</Link>
             </p>
