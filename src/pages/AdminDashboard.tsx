@@ -190,16 +190,36 @@ const AdminDashboard: React.FC = () => {
     e.preventDefault();
     
     try {
+      // Validate required fields
+      if (!hotelFormData.name || !hotelFormData.location || !hotelFormData.price_per_night) {
+        toast.error('Please fill in all required fields (Name, Location, Price per Night)');
+        return;
+      }
+
+      // Validate price_per_night is a valid number
+      const price = parseFloat(hotelFormData.price_per_night);
+      if (isNaN(price) || price <= 0) {
+        toast.error('Price per night must be a valid positive number');
+        return;
+      }
+
+      // Validate rating if provided
+      const rating = hotelFormData.rating ? parseFloat(hotelFormData.rating) : 0;
+      if (hotelFormData.rating && (isNaN(rating) || rating < 0 || rating > 5)) {
+        toast.error('Rating must be a number between 0 and 5');
+        return;
+      }
+
       const hotelData = {
-        name: hotelFormData.name,
-        location: hotelFormData.location,
-        address: hotelFormData.address,
-        description: hotelFormData.description,
-        price_per_night: parseFloat(hotelFormData.price_per_night),
-        rating: parseFloat(hotelFormData.rating),
-        images: hotelFormData.images,
-        amenities: hotelFormData.amenities,
-        policies: hotelFormData.policies
+        name: hotelFormData.name.trim(),
+        location: hotelFormData.location.trim(),
+        address: hotelFormData.address.trim() || undefined,
+        description: hotelFormData.description.trim() || undefined,
+        price_per_night: price,
+        rating: rating,
+        images: hotelFormData.images.length > 0 ? hotelFormData.images : undefined,
+        amenities: hotelFormData.amenities.length > 0 ? hotelFormData.amenities : undefined,
+        policies: hotelFormData.policies.length > 0 ? hotelFormData.policies : undefined
       };
 
       if (selectedHotel) {
@@ -213,7 +233,9 @@ const AdminDashboard: React.FC = () => {
       setShowHotelModal(false);
       loadDashboardData();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to save hotel');
+      console.error('Save hotel error:', error);
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Failed to save hotel';
+      toast.error(errorMessage);
     }
   };
 
