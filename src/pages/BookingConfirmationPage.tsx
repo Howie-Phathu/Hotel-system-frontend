@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation, useParams, Link } from 'react-router-dom';
 import { bookingsAPI } from '../services/api';
 import { FaCheckCircle, FaMapMarkerAlt, FaCalendarAlt, FaUsers, FaHotel, FaCreditCard } from 'react-icons/fa';
 import toast from 'react-hot-toast';
@@ -36,83 +36,110 @@ interface BookingData {
   };
 }
 
+function buildBookingFromApi(bookingData: any, bookingId: string): BookingData {
+  return {
+    id: String(bookingData.id ?? bookingData.booking_id ?? bookingId),
+    hotel_id: String(bookingData.hotel_id ?? bookingData.hotel?.id ?? ''),
+    check_in_date: bookingData.check_in_date ?? bookingData.checkInDate ?? '',
+    check_out_date: bookingData.check_out_date ?? bookingData.checkOutDate ?? '',
+    number_of_guests: bookingData.adults ?? bookingData.number_of_guests ?? bookingData.guests ?? 1,
+    number_of_rooms: bookingData.rooms ?? bookingData.number_of_rooms ?? 1,
+    total_amount: String(bookingData.total_price ?? bookingData.total_amount ?? bookingData.totalAmount ?? '0'),
+    currency: bookingData.currency ?? 'ZAR',
+    booking_status: bookingData.status ?? bookingData.booking_status ?? 'confirmed',
+    payment_status: bookingData.payment_status ?? bookingData.paymentStatus ?? 'paid',
+    hotel: {
+      id: String(bookingData.hotel_id ?? bookingData.hotel?.id ?? ''),
+      name: bookingData.hotel_name ?? bookingData.hotel?.name ?? 'Hotel',
+      address: bookingData.address ?? bookingData.hotel?.address ?? bookingData.location ?? '',
+      city: bookingData.city ?? bookingData.hotel?.city ?? bookingData.location ?? '',
+      contact_phone: bookingData.contact_phone ?? bookingData.hotel?.contact_phone,
+    },
+    user: {
+      email: bookingData.user_email ?? bookingData.user?.email ?? '',
+      first_name: bookingData.user_first_name ?? bookingData.user?.first_name,
+      last_name: bookingData.user_last_name ?? bookingData.user?.last_name,
+    },
+    guest_details: bookingData.guest_details ?? {
+      name: (bookingData.user_first_name || bookingData.user?.first_name) && (bookingData.user_last_name || bookingData.user?.last_name)
+        ? `${bookingData.user_first_name || bookingData.user?.first_name} ${bookingData.user_last_name || bookingData.user?.last_name}`.trim()
+        : undefined,
+      email: bookingData.user_email ?? bookingData.email,
+      phone: bookingData.phone,
+      address: bookingData.address,
+    },
+  };
+}
+
+function buildBookingFromState(stateData: any, bookingId: string): BookingData {
+  const hotel = stateData.hotel ?? {};
+  return {
+    id: String(bookingId),
+    hotel_id: String(stateData.hotel_id ?? hotel.id ?? ''),
+    check_in_date: stateData.check_in_date ?? stateData.checkIn ?? '',
+    check_out_date: stateData.check_out_date ?? stateData.checkOut ?? '',
+    number_of_guests: stateData.number_of_guests ?? stateData.guests ?? stateData.adults ?? 1,
+    number_of_rooms: stateData.number_of_rooms ?? stateData.rooms ?? 1,
+    total_amount: String(stateData.total_amount ?? stateData.total_price ?? stateData.total ?? '0'),
+    currency: stateData.currency ?? 'ZAR',
+    booking_status: 'confirmed',
+    payment_status: 'paid',
+    hotel: {
+      id: String(hotel.id ?? stateData.hotel_id ?? ''),
+      name: hotel.name ?? 'Hotel',
+      address: hotel.address ?? stateData.address ?? '',
+      city: hotel.city ?? stateData.city ?? '',
+      contact_phone: hotel.contact_phone,
+    },
+    user: {
+      email: stateData.user_email ?? stateData.guest_details?.email ?? '',
+      first_name: stateData.user?.first_name,
+      last_name: stateData.user?.last_name,
+    },
+    guest_details: stateData.guest_details,
+  };
+}
+
 const BookingConfirmationPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { bookingId: paramBookingId } = useParams<{ bookingId?: string }>();
   const [booking, setBooking] = useState<BookingData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const bookingId = paramBookingId ?? location.state?.bookingId;
+  const stateBookingData = location.state?.bookingData;
+
   useEffect(() => {
-    const bookingId = location.state?.bookingId;
-    
     if (!bookingId) {
+      setLoading(false);
       toast.error('Booking information not found');
       navigate('/hotels');
       return;
     }
 
-    // Fetch full booking details
     const fetchBooking = async () => {
       try {
-        console.log('Fetching booking with ID:', bookingId);
         const response = await bookingsAPI.getById(String(bookingId));
-        console.log('Booking API response:', response);
-        
-        // Handle different response formats
-        const bookingData = response.data?.booking || response.data || response.booking || response;
-        
-        if (bookingData) {
-          // Transform the booking data to match the expected format
-          const transformedBooking: BookingData = {
-            id: bookingData.id || bookingData.booking_id || bookingId,
-            hotel_id: bookingData.hotel_id || bookingData.hotel?.id || '',
-            check_in_date: bookingData.check_in_date || bookingData.checkInDate || '',
-            check_out_date: bookingData.check_out_date || bookingData.checkOutDate || '',
-            number_of_guests: bookingData.adults || bookingData.number_of_guests || bookingData.guests || 1,
-            number_of_rooms: bookingData.rooms || bookingData.number_of_rooms || 1,
-            total_amount: String(bookingData.total_price || bookingData.total_amount || bookingData.totalAmount || '0'),
-            currency: bookingData.currency || 'ZAR',
-            booking_status: bookingData.status || bookingData.booking_status || 'confirmed',
-            payment_status: bookingData.payment_status || bookingData.paymentStatus || 'paid',
-            hotel: {
-              id: bookingData.hotel_id || bookingData.hotel?.id || '',
-              name: bookingData.hotel_name || bookingData.hotel?.name || 'Hotel',
-              address: bookingData.address || bookingData.hotel?.address || bookingData.location || '',
-              city: bookingData.city || bookingData.hotel?.city || bookingData.location || '',
-              contact_phone: bookingData.contact_phone || bookingData.hotel?.contact_phone,
-            },
-            user: {
-              email: bookingData.user_email || bookingData.user?.email || '',
-              first_name: bookingData.user_first_name || bookingData.user?.first_name,
-              last_name: bookingData.user_last_name || bookingData.user?.last_name,
-            },
-            guest_details: bookingData.guest_details || {
-              name: (bookingData.user_first_name || bookingData.user?.first_name) && (bookingData.user_last_name || bookingData.user?.last_name)
-                ? `${bookingData.user_first_name || bookingData.user?.first_name} ${bookingData.user_last_name || bookingData.user?.last_name}` 
-                : undefined,
-              email: bookingData.user_email || bookingData.email,
-              phone: bookingData.phone,
-              address: bookingData.address,
-            },
-          };
-          
-          console.log('Transformed booking:', transformedBooking);
-          setBooking(transformedBooking);
-          setLoading(false);
+        const raw = response.data?.booking ?? response.data ?? response.booking ?? response;
+        if (raw) {
+          setBooking(buildBookingFromApi(raw, bookingId));
         } else {
           throw new Error('Booking data not found in response');
         }
       } catch (error: any) {
-        console.error('Failed to load booking details:', error);
-        console.error('Error response:', error.response);
-        toast.error(error.response?.data?.message || 'Failed to load booking details');
-        // Don't navigate away immediately, show error state
+        if (stateBookingData) {
+          setBooking(buildBookingFromState(stateBookingData, bookingId));
+        } else {
+          toast.error(error.response?.data?.message ?? 'Failed to load booking details');
+        }
+      } finally {
         setLoading(false);
       }
     };
 
     fetchBooking();
-  }, [location.state, navigate]);
+  }, [bookingId, stateBookingData, navigate]);
 
   if (loading) {
     return (

@@ -62,6 +62,7 @@ function App() {
                     <Route path="favorites" element={<ErrorBoundary><ProtectedRoute><FavoritesPage /></ProtectedRoute></ErrorBoundary>} />
                     <Route path='payment/:hotelId' element={<ErrorBoundary><ProtectedRoute><PaymentMethodPage /></ProtectedRoute></ErrorBoundary>} />
                     <Route path="booking-confirmation" element={<ErrorBoundary><ProtectedRoute><BookingConfirmationPage /></ProtectedRoute></ErrorBoundary>} />
+                    <Route path="booking-confirmation/:bookingId" element={<ErrorBoundary><ProtectedRoute><BookingConfirmationPage /></ProtectedRoute></ErrorBoundary>} />
                     <Route path="notifications" element={<ErrorBoundary><ProtectedRoute><NotificationsPage /></ProtectedRoute></ErrorBoundary>} />
                     <Route path="*" element={<ErrorBoundary><NotFoundPage /></ErrorBoundary>} />
                   </Route>

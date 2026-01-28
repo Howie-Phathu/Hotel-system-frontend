@@ -230,7 +230,7 @@ const PaymentMethodPage: React.FC = () => {
   }
 
   const handlePaymentSuccess = () => {
-    navigate('/booking-confirmation', {
+    navigate(`/booking-confirmation/${bookingId}`, {
       state: {
         bookingId,
         bookingData,

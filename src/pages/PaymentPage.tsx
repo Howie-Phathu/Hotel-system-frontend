@@ -75,14 +75,11 @@ const PaymentPage: React.FC = () => {
 
   const handleCompleteReservation = async (completedBookingId: string, paymentIntentId: string) => {
     try {
-      // Redirect to confirmation page with payment success
-      navigate('/booking-confirmation', { 
-        state: { 
-          bookingData, 
+      navigate(`/booking-confirmation/${completedBookingId}`, {
+        state: {
           bookingId: completedBookingId,
-          paymentIntentId,
-          paymentSuccess: true 
-        } 
+          bookingData: { ...bookingData, paymentIntentId, paymentSuccess: true },
+        },
       });
     } catch (error) {
       console.error('Navigation failed:', error);
